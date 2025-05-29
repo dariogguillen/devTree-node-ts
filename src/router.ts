@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import { createAccount, login } from "./handlers";
+import { handleInputErrors } from "./middleware/validation";
 
 const router = Router();
 
@@ -15,6 +16,7 @@ router.post(
   body("password")
     .isLength({ min: 12 })
     .withMessage("Password length min 12 characters"),
+  handleInputErrors,
   createAccount,
 );
 
@@ -22,6 +24,7 @@ router.post(
   "/auth/login",
   body("email").isEmail().withMessage("Invalid email"),
   body("password").notEmpty().withMessage("Not empty password"),
+  handleInputErrors,
   login,
 );
 
