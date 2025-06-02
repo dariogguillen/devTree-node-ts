@@ -5,7 +5,7 @@ import User, { IUser } from "../models/User";
 declare global {
   namespace Express {
     interface Request {
-      user: IUser;
+      user?: IUser;
     }
   }
 }
@@ -33,7 +33,6 @@ export const authenticateToken = async (
         res.status(404).json({ error: "User not found" });
         return;
       }
-      res.status(200).json({ response: "User found", user });
       req.user = user;
       next();
     }
