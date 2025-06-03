@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import slug from "slug";
 import User from "../models/User";
+import { v4 as uuid } from "uuid";
 import { checkPassword, hashPassword } from "../utils/auth";
-import { generateJWT, verifyJWT } from "../utils/jwt";
+import { generateJWT } from "../utils/jwt";
+import formidable from "formidable";
+import cloudinary from "../config/cloudinary";
 
 export const createAccount = async (req: Request, res: Response) => {
   const { email, username, password } = req.body;
@@ -75,6 +78,45 @@ export const updateProfile = async (req: Request, res: Response) => {
     await req.user.save();
 
     res.status(200).json({ response: "User profile updated successfully" });
+  } catch (e) {
+    const error = new Error("An error occurred");
+    res.status(500).json({ error: error.message });
+    return;
+  }
+};
+
+export const uploadImage = async (req: Request, res: Response) => {
+  const form = formidable({ multiples: false });
+  form.parse(req, (error, fields, files) => {
+    if (files.file) {
+      cloudinary.uploader.upload(
+        files.file[0].filepath,
+        { public_id: uuid() },
+        async (error, result) => {
+          console.log({ result });
+          console.log({ error });
+          if (error || !req.user) {
+            res
+              .status(500)
+              .json({ error: "An error occurred while uploading the image" });
+            return;
+          }
+          if (result) {
+            req.user.image = result.secure_url;
+            await req.user.save();
+            res
+              .status(200)
+              .json({
+                response: "Image uploaded successfully",
+                image: result.secure_url,
+              });
+          }
+        },
+      );
+    }
+  });
+
+  try {
   } catch (e) {
     const error = new Error("An error occurred");
     res.status(500).json({ error: error.message });
