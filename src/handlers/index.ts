@@ -62,7 +62,7 @@ export const updateProfile = async (req: Request, res: Response) => {
       res.status(404).json({ error: "User not found" });
       return;
     }
-    const { description } = req.body;
+    const { description, links } = req.body;
 
     const userName = slug(req.body.username, "");
     const usernameExist = await User.findOne({ username: userName });
@@ -74,6 +74,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
     req.user.description = description;
     req.user.username = userName;
+    req.user.links = links;
 
     await req.user.save();
 
@@ -104,12 +105,10 @@ export const uploadImage = async (req: Request, res: Response) => {
           if (result) {
             req.user.image = result.secure_url;
             await req.user.save();
-            res
-              .status(200)
-              .json({
-                response: "Image uploaded successfully",
-                image: result.secure_url,
-              });
+            res.status(200).json({
+              response: "Image uploaded successfully",
+              image: result.secure_url,
+            });
           }
         },
       );
