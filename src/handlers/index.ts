@@ -82,7 +82,6 @@ export const updateProfile = async (req: Request, res: Response) => {
   } catch (e) {
     const error = new Error("An error occurred");
     res.status(500).json({ error: error.message });
-    return;
   }
 };
 
@@ -117,6 +116,24 @@ export const uploadImage = async (req: Request, res: Response) => {
   } catch (e) {
     const error = new Error("An error occurred");
     res.status(500).json({ error: error.message });
-    return;
+  }
+};
+
+export const getUserByUsername = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const user = await User.findOne({ username }).select(
+      "-_id -email -__v -password",
+    );
+
+    if (!user) {
+      const error = new Error("User not found");
+      res.status(404).json({ error: error.message });
+    }
+
+    res.status(200).json({ response: "User found", user });
+  } catch (e) {
+    const error = new Error("An error occurred");
+    res.status(500).json({ error: error.message });
   }
 };

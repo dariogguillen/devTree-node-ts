@@ -3,6 +3,7 @@ import { body } from "express-validator";
 import {
   createAccount,
   getUser,
+  getUserByUsername,
   login,
   updateProfile,
   uploadImage,
@@ -47,5 +48,7 @@ router.patch(
 );
 
 router.post("/user/image", authenticateToken, uploadImage);
+
+router.get("/:username", getUserByUsername);
 
 export default router;
