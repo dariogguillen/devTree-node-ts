@@ -88,34 +88,32 @@ export const updateProfile = async (req: Request, res: Response) => {
 
 export const uploadImage = async (req: Request, res: Response) => {
   const form = formidable({ multiples: false });
-  form.parse(req, (error, fields, files) => {
-    if (files.file) {
-      cloudinary.uploader.upload(
-        files.file[0].filepath,
-        { public_id: uuid() },
-        async (error, result) => {
-          console.log({ result });
-          console.log({ error });
-          if (error || !req.user) {
-            res
-              .status(500)
-              .json({ error: "An error occurred while uploading the image" });
-            return;
-          }
-          if (result) {
-            req.user.image = result.secure_url;
-            await req.user.save();
-            res.status(200).json({
-              response: "Image uploaded successfully",
-              image: result.secure_url,
-            });
-          }
-        },
-      );
-    }
-  });
 
   try {
+    form.parse(req, (error, fields, files) => {
+      if (files.file) {
+        cloudinary.uploader.upload(
+          files.file[0].filepath,
+          { public_id: uuid() },
+          async (error, result) => {
+            if (error || !req.user) {
+              res
+                .status(500)
+                .json({ error: "An error occurred while uploading the image" });
+              return;
+            }
+            if (result) {
+              req.user.image = result.secure_url;
+              await req.user.save();
+              res.status(200).json({
+                response: "Image uploaded successfully",
+                image: result.secure_url,
+              });
+            }
+          },
+        );
+      }
+    });
   } catch (e) {
     const error = new Error("An error occurred");
     res.status(500).json({ error: error.message });
