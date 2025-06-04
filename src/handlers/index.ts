@@ -137,3 +137,19 @@ export const getUserByUsername = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const searchUsername = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.body;
+    const userExists = await User.findOne({ username });
+    if (userExists) {
+      const error = new Error("Username already in used");
+      res.status(409).json({ error: error.message });
+      return;
+    }
+    res.status(200).json({ response: "Username available" });
+  } catch (e) {
+    const error = new Error("An error occurred");
+    res.status(500).json({ error: error.message });
+  }
+};

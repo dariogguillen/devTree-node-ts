@@ -5,6 +5,7 @@ import {
   getUser,
   getUserByUsername,
   login,
+  searchUsername,
   updateProfile,
   uploadImage,
 } from "./handlers";
@@ -41,7 +42,6 @@ router.get("/user", authenticateToken, getUser);
 router.patch(
   "/user",
   body("username").notEmpty().withMessage("Not empty username."),
-  body("description").notEmpty().withMessage("Not empty description."),
   handleInputErrors,
   authenticateToken,
   updateProfile,
@@ -50,5 +50,12 @@ router.patch(
 router.post("/user/image", authenticateToken, uploadImage);
 
 router.get("/:username", getUserByUsername);
+
+router.post(
+  "/search",
+  body("username").notEmpty().withMessage("Not empty username."),
+  handleInputErrors,
+  searchUsername,
+);
 
 export default router;
